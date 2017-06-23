@@ -13,6 +13,4 @@ interface ApplicationComponent {
 
     fun inject(service: LocationTrackingService)
 
-
-
 }

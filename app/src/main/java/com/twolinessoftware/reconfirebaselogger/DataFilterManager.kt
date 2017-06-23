@@ -4,6 +4,10 @@ import android.location.Location
 import com.reconinstruments.os.metrics.HUDMetricsID
 import com.twolinessoftware.reconfirebaselogger.model.DataPoint
 import com.twolinessoftware.reconfirebaselogger.model.Database
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 
 class DataFilterManager(internal var database: Database){
@@ -41,7 +45,8 @@ class DataFilterManager(internal var database: Database){
         gpxWriter.finalizeActivity()
     }
 
-    private fun writeDataPoint(){
+
+    private fun addDataPoint(): DataPoint {
         var datapoint = DataPoint()
         datapoint.cadence = if(cadence != null) cadence!! else -1
         datapoint.hr = if(hr != null) hr!! else -1
@@ -49,11 +54,21 @@ class DataFilterManager(internal var database: Database){
         datapoint.longitude = location?.longitude!!
         datapoint.timestamp = System.currentTimeMillis()
 
-        database.dataPointDao().insert(datapoint)
+        Single.fromCallable {
+            database.dataPointDao().insert(datapoint)
+        }.subscribeOn(Schedulers.newThread()).subscribe()
+
+        return datapoint
+    }
+
+    private fun writeDataPoint(){
+
+        var datapoint = addDataPoint()
+
+        gpxWriter.addPoint(datapoint)
 
         clearDataPoint()
 
-        gpxWriter.addPoint(datapoint)
     }
 
     private fun clearDataPoint(){

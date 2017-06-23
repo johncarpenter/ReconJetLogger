@@ -21,10 +21,17 @@ class ActivityStatusReceiver: BroadcastReceiver() {
 
             if(status == HUDActivityStatus.STATUS_ONGOING && !LocationTrackingService.isRunning){
                 context.startService(intentService)
+
+                LocationTrackingService.Status = LocationTrackingService.Status.RUNNING
                 Timber.i("Starting Tracking Service")
-            }else if(LocationTrackingService.isRunning){
+            }else if(status == HUDActivityStatus.STATUS_PAUSED && LocationTrackingService.isRunning){
+               // context.stopService(intentService)
+                LocationTrackingService.Status = LocationTrackingService.Status.PAUSED
+                Timber.i("Pausing Tracking Service")
+            }else if(status == HUDActivityStatus.STATUS_NOACTIVITY && LocationTrackingService.isRunning){
                 context.stopService(intentService)
-                Timber.i("Stopping Tracking Service")
+                LocationTrackingService.Status = LocationTrackingService.Status.STOPPED
+                Timber.i("Stopping Tracking Service(end)")
             }
         }
 

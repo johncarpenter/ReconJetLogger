@@ -27,6 +27,11 @@ class LocationTrackingService : Service(), MetricsValueChangedListener, Location
     @Inject
     lateinit var dataFilterManager : DataFilterManager
 
+    @Inject
+    lateinit var externalSensorManager : ExternalSensorManager
+
+    enum class Status {RUNNING,PAUSED, STOPPED}
+
     override fun onBind(intent: Intent?) = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -42,18 +47,20 @@ class LocationTrackingService : Service(), MetricsValueChangedListener, Location
         createNotification("Recording")
 
         try {
-            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, INTERVAL, DISTANCE, this)
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, INTERVAL, DISTANCE, this)
+            metricsManager.registerMetricsListener(this,HUDMetricsID.HEART_RATE)
+            metricsManager.registerMetricsListener(this,HUDMetricsID.CADENCE_EXT)
+            metricsManager.registerMetricsListener(this,HUDMetricsID.SPEED_CADENCE_CADENCE)
         } catch (e: SecurityException) {
             Timber.e("Fail to request location update", e)
         } catch (e: IllegalArgumentException) {
             Timber.e("GPS provider does not exist", e)
         }
 
-        metricsManager.registerMetricsListener(this,HUDMetricsID.HEART_RATE)
-        metricsManager.registerMetricsListener(this,HUDMetricsID.CADENCE_EXT)
-        metricsManager.registerMetricsListener(this,HUDMetricsID.SPEED_CADENCE_CADENCE)
+        externalSensorManager.connect()
 
         dataFilterManager.startActivity()
+
 
         super.onCreate()
     }
@@ -62,6 +69,8 @@ class LocationTrackingService : Service(), MetricsValueChangedListener, Location
         super.onDestroy()
         isRunning = false
         createNotification("Stopping Recording")
+
+        externalSensorManager.disconnect()
 
         dataFilterManager.finishActivity()
 
@@ -87,28 +96,31 @@ class LocationTrackingService : Service(), MetricsValueChangedListener, Location
     }
 
     override fun onMetricsValueChanged(metricID: Int, value: Float, changeTime: Long, isValid: Boolean) {
-        dataFilterManager.addMetric(metricID,value,changeTime)
+        if (Status != LocationTrackingService.Status.PAUSED ) dataFilterManager.addMetric(metricID,value,changeTime)
     }
 
     override fun onLocationChanged(location: Location?) {
-        if(location != null) dataFilterManager.addLocation(location)
+         if(location != null && Status != LocationTrackingService.Status.PAUSED) dataFilterManager.addLocation(location)
     }
 
     override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Timber.v("Status Changed")
     }
 
     override fun onProviderEnabled(p0: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Timber.v("Status Changed:Provider Enabled")
     }
 
     override fun onProviderDisabled(p0: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Timber.v("Status Changed:Provider Disabled")
     }
 
     companion object {
 
         @JvmStatic var isRunning = false
+
+        @JvmStatic var Status : Status = LocationTrackingService.Status.STOPPED
+
 
         val INTERVAL = 1000.toLong() // In milliseconds
         val DISTANCE = 0.toFloat() // In meters

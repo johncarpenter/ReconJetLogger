@@ -6,6 +6,7 @@
 /captures
 .externalNativeBuild
 
+
 # Built application files
 *.apk
 *.ap_
@@ -42,12 +43,9 @@ captures/
 
 # Intellij
 *.iml
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
 .idea/dictionaries
 .idea/libraries
-.idea/vcs.xml
+.idea/*.xml
 
 # Keystore files
 *.jks

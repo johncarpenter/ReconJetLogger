@@ -6,6 +6,7 @@ import android.arch.persistence.room.Room
 import android.content.Context
 import android.location.LocationManager
 import com.reconinstruments.os.HUDOS
+import com.reconinstruments.os.hardware.extsensor.HUDExternalSensorManager
 import com.reconinstruments.os.metrics.HUDMetricsManager
 import com.twolinessoftware.reconfirebaselogger.model.Database
 import dagger.Module
@@ -36,11 +37,23 @@ class AndroidModule(private val application: Application) {
     fun provideLocationManager(): LocationManager {
         return application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
+
     @Provides
-    @Singleton
     fun provideHudMetricsMananger(): HUDMetricsManager {
         return HUDOS.getHUDService(HUDOS.HUD_METRICS_SERVICE) as HUDMetricsManager
     }
+
+    @Provides
+    fun provideHudExternalSensorMananger(): HUDExternalSensorManager {
+        return HUDOS.getHUDService(HUDOS.HUD_EXTERNAL_SENSOR_SERVICE) as HUDExternalSensorManager
+    }
+
+    @Provides
+    @Singleton
+    fun provideExternalSensorManager(hudExternalSensorManager: HUDExternalSensorManager): ExternalSensorManager{
+        return ExternalSensorManager(hudExternalSensorManager)
+    }
+
 
     @Provides
     @Singleton
