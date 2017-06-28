@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 2Lines Software Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.twolinessoftware.reconfirebaselogger
 import android.app.Notification
 import android.app.NotificationManager
@@ -75,7 +91,7 @@ class LocationTrackingService : Service(), MetricsValueChangedListener, Location
         dataFilterManager.finishActivity()
 
         try {
-            locationManager?.removeUpdates(this)
+            locationManager.removeUpdates(this)
         } catch (e: Exception) {
             Timber.e("Unable to remove location listener $e.message")
         }
@@ -92,7 +108,7 @@ class LocationTrackingService : Service(), MetricsValueChangedListener, Location
                 .setSmallIcon(R.drawable.icon_checkmark)
                 .setContentText(text)
                 .build()
-        notificationMananger?.notify(0, notification)
+        notificationMananger.notify(0, notification)
     }
 
     override fun onMetricsValueChanged(metricID: Int, value: Float, changeTime: Long, isValid: Boolean) {

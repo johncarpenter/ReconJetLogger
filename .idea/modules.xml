@@ -3,8 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/FirebaseLogger.iml" filepath="$PROJECT_DIR$/FirebaseLogger.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ReconJetLogger.iml" filepath="$PROJECT_DIR$/ReconJetLogger.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://F:\Workspaces\2Lines\Recon\FirebaseLogger\ReconJetLogger.iml" filepath="F:\Workspaces\2Lines\Recon\FirebaseLogger\ReconJetLogger.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
